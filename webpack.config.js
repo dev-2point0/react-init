@@ -1,9 +1,14 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
 
 const path = require("path");
+const fs = require("fs");
+const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const WorkboxWebpackPlugin = require("workbox-webpack-plugin");
+const appDir = fs.realpathSync(process.cwd());
+const resolveApp = relativePath => path.resolve(appDir, relativePath);
+// const nodeExternals = require('webpack-node-externals');
 
 const isProduction = process.env.NODE_ENV == "production";
 
@@ -12,14 +17,18 @@ const stylesHandler = isProduction
   : "style-loader";
 
 const config = {
-  entry: "./src/index.ts",
+  entry: [
+    "./src/index.ts",
+  ],
   output: {
     path: path.resolve(__dirname, "dist"),
+    publicPath: "/"
   },
-  devServer: {
-    open: true,
-    host: "localhost",
-  },
+  // modules: ['node_modules', resolveApp('node_modules')].concat(
+  //     process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
+  // ),
+  // externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
+  // externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
   plugins: [
     new HtmlWebpackPlugin({
       template: "public/index.html",
@@ -53,7 +62,7 @@ const config = {
     ],
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js"],
+    extensions: [".tsx", ".ts", ".js", ".json"],
   },
 };
 
@@ -66,6 +75,27 @@ module.exports = () => {
     config.plugins.push(new WorkboxWebpackPlugin.GenerateSW());
   } else {
     config.mode = "development";
+    config.devtool ='inline-source-map';
+    config.devServer = {
+      hot: true,
+      open: true
+    };
+
+    config.entry = [
+      "webpack-hot-middleware/client?timeout=10000&reload=true",
+      "./src/index.ts",
+    ];
+
+    config.plugins = [
+      new HtmlWebpackPlugin({
+        template: "public/index.html",
+      }),
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.NoEmitOnErrorsPlugin(),
+  
+      // Add your plugins here
+      // Learn more about plugins from https://webpack.js.org/configuration/plugins/
+    ]
   }
   return config;
 };
