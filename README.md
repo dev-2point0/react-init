@@ -1,15 +1,17 @@
-# 🚀 Welcome to your new awesome project!
+# 🚀 React Init
+# This project has very basic setup for reactjs + typescript + webpack and a lightweight express server
+React Init for all react projects
 
-This project has been created using **webpack-cli**, you can now run
-
-```
-npm run build
-```
-
-or
+For Development mode
 
 ```
-yarn build
+npm run start:dev
 ```
 
-to bundle your application
+
+For Production mode
+```
+npm run build:prod
+npm run build:prod:server
+npm run start
+```
